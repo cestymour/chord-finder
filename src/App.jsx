@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import "./App.css";
 
 const NOTES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 const NOTE_ALIASES = { "C#": "Db", "D#": "Eb", "F#": "Gb", "G#": "Ab", "A#": "Bb" };
@@ -78,82 +79,24 @@ export default function App() {
     );
   }
 
-  const allNoteLabels = NOTES.flatMap(n => NOTE_ALIASES[n] ? [n, NOTE_ALIASES[n]] : [n]);
-
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#0a0a0f",
-      fontFamily: "'DM Mono', 'Courier New', monospace",
-      color: "#e8e0d0",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      padding: "40px 20px",
-      backgroundImage: `radial-gradient(ellipse at 20% 50%, rgba(180,120,60,0.07) 0%, transparent 60%), 
-                        radial-gradient(ellipse at 80% 20%, rgba(80,60,180,0.07) 0%, transparent 50%)`,
-    }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:wght@700;900&display=swap');
-        * { box-sizing: border-box; }
-        .mode-btn { transition: all 0.2s ease; cursor: pointer; border: none; }
-        .mode-btn:hover { opacity: 0.85; }
-        .note-pill { transition: all 0.15s ease; cursor: pointer; }
-        .note-pill:hover { transform: translateY(-1px); }
-        .piano-key { transition: all 0.1s ease; cursor: pointer; }
-        .piano-key:hover { filter: brightness(1.15); }
-        .result-card { transition: all 0.2s ease; }
-        .result-card:hover { transform: translateX(4px); }
-        select { background: #1a1820; color: #e8e0d0; border: 1px solid #3a3040; border-radius: 8px; padding: 10px 14px; font-family: inherit; font-size: 14px; cursor: pointer; outline: none; appearance: none; }
-        select:focus { border-color: #c8982a; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #1a1820; }
-        ::-webkit-scrollbar-thumb { background: #3a3040; border-radius: 2px; }
-      `}</style>
-
+    <div className="app">
       {/* Header */}
-      <div style={{ textAlign: "center", marginBottom: 40 }}>
-        <div style={{ fontSize: 11, letterSpacing: 6, color: "#c8982a", textTransform: "uppercase", marginBottom: 10 }}>
-          Harmony Explorer
-        </div>
-        <h1 style={{
-          fontFamily: "'Playfair Display', serif",
-          fontSize: "clamp(2rem, 5vw, 3.5rem)",
-          fontWeight: 900,
-          margin: 0,
-          background: "linear-gradient(135deg, #e8e0d0 30%, #c8982a 100%)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          letterSpacing: "-1px",
-        }}>
-          Chord Finder
-        </h1>
+      <div className="app-header">
+        <div className="app-kicker">Harmony Explorer</div>
+        <h1 className="app-title">Chord Finder</h1>
       </div>
 
       {/* Mode Toggle */}
-      <div style={{
-        display: "flex",
-        background: "#14121a",
-        borderRadius: 12,
-        padding: 4,
-        marginBottom: 40,
-        border: "1px solid #2a2535",
-        gap: 4,
-      }}>
+      <div className="mode-toggle">
         {["chord-to-notes", "notes-to-chord"].map(m => (
           <button
             key={m}
-            className="mode-btn"
-            onClick={() => { setMode(m); setSelectedNotes([]); }}
-            style={{
-              padding: "10px 22px",
-              borderRadius: 9,
-              fontSize: 13,
-              fontFamily: "inherit",
-              background: mode === m ? "#c8982a" : "transparent",
-              color: mode === m ? "#0a0a0f" : "#9090a0",
-              fontWeight: mode === m ? 500 : 400,
-              letterSpacing: 0.3,
+            type="button"
+            className={`mode-btn${mode === m ? " mode-btn--active" : ""}`}
+            onClick={() => {
+              setMode(m);
+              setSelectedNotes([]);
             }}
           >
             {m === "chord-to-notes" ? "Accord → Notes" : "Notes → Accord"}
@@ -162,60 +105,44 @@ export default function App() {
       </div>
 
       {/* Main Panel */}
-      <div style={{
-        width: "100%",
-        maxWidth: 680,
-        background: "#100e16",
-        border: "1px solid #2a2535",
-        borderRadius: 20,
-        padding: "32px",
-        marginBottom: 32,
-      }}>
+      <div className="main-panel">
         {mode === "chord-to-notes" ? (
           <>
-            <div style={{ fontSize: 11, letterSpacing: 4, color: "#666", textTransform: "uppercase", marginBottom: 20 }}>
-              Sélectionner l'accord
-            </div>
-            <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 28 }}>
-              {/* Root selector */}
-              <div style={{ position: "relative" }}>
-                <select value={selectedRoot} onChange={e => setSelectedRoot(e.target.value)} style={{ minWidth: 100 }}>
+            <div className="section-label section-label--mb-20">Sélectionner l'accord</div>
+            <div className="select-row">
+              <div className="select-wrap">
+                <select
+                  className="select--min-w"
+                  value={selectedRoot}
+                  onChange={e => setSelectedRoot(e.target.value)}
+                >
                   {NOTES.map(n => (
-                    <option key={n} value={n}>{noteLabel(n)}</option>
+                    <option key={n} value={n}>
+                      {noteLabel(n)}
+                    </option>
                   ))}
                 </select>
-                <div style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", color: "#c8982a", pointerEvents: "none", fontSize: 10 }}>▼</div>
+                <div className="select-chevron">▼</div>
               </div>
-              {/* Type selector */}
-              <div style={{ position: "relative", flex: 1, minWidth: 160 }}>
-                <select value={selectedType} onChange={e => setSelectedType(e.target.value)} style={{ width: "100%" }}>
+              <div className="select-wrap select-wrap--grow">
+                <select className="select--full" value={selectedType} onChange={e => setSelectedType(e.target.value)}>
                   {Object.keys(CHORD_TYPES).map(t => (
-                    <option key={t} value={t}>{t}</option>
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
                   ))}
                 </select>
-                <div style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", color: "#c8982a", pointerEvents: "none", fontSize: 10 }}>▼</div>
+                <div className="select-chevron">▼</div>
               </div>
             </div>
 
-            {/* Result */}
-            <div style={{ marginBottom: 8 }}>
-              <div style={{ fontSize: 11, letterSpacing: 4, color: "#666", textTransform: "uppercase", marginBottom: 14 }}>
-                Notes de l'accord
-              </div>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <div className="chord-notes-block">
+              <div className="section-label section-label--mb-14">Notes de l'accord</div>
+              <div className="chord-notes-row">
                 {chordNotes.map((note, i) => (
-                  <div key={i} style={{
-                    background: i === 0 ? "rgba(200,152,42,0.2)" : "rgba(255,255,255,0.05)",
-                    border: `1px solid ${i === 0 ? "#c8982a" : "#3a3040"}`,
-                    borderRadius: 10,
-                    padding: "10px 20px",
-                    fontSize: 18,
-                    fontWeight: 500,
-                    color: i === 0 ? "#c8982a" : "#e8e0d0",
-                    fontFamily: "'Playfair Display', serif",
-                  }}>
+                  <div key={i} className={`note-result${i === 0 ? " note-result--root" : ""}`}>
                     {noteLabel(note)}
-                    <span style={{ fontSize: 10, color: "#666", marginLeft: 6, fontFamily: "inherit" }}>
+                    <span className="note-result-meta">
                       {i === 0 ? "root" : `+${CHORD_TYPES[selectedType][i]}st`}
                     </span>
                   </div>
@@ -225,28 +152,18 @@ export default function App() {
           </>
         ) : (
           <>
-            <div style={{ fontSize: 11, letterSpacing: 4, color: "#666", textTransform: "uppercase", marginBottom: 16 }}>
+            <div className="section-label section-label--mb-16">
               Sélectionner les notes ({selectedNotes.length} sélectionnée{selectedNotes.length > 1 ? "s" : ""})
             </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 24 }}>
+            <div className="note-pills-row">
               {NOTES.map(note => {
                 const active = selectedNotes.includes(note);
                 return (
                   <button
                     key={note}
-                    className="note-pill"
+                    type="button"
+                    className={`note-pill${active ? " note-pill--active" : ""}`}
                     onClick={() => toggleNote(note)}
-                    style={{
-                      padding: "8px 16px",
-                      borderRadius: 8,
-                      border: `1px solid ${active ? "#c8982a" : "#3a3040"}`,
-                      background: active ? "rgba(200,152,42,0.18)" : "transparent",
-                      color: active ? "#c8982a" : "#7070808",
-                      fontFamily: "inherit",
-                      fontSize: 14,
-                      cursor: "pointer",
-                      fontWeight: active ? 500 : 400,
-                    }}
                   >
                     {noteLabel(note)}
                   </button>
@@ -256,27 +173,24 @@ export default function App() {
 
             {selectedNotes.length >= 2 && (
               <>
-                <div style={{ fontSize: 11, letterSpacing: 4, color: "#666", textTransform: "uppercase", marginBottom: 14 }}>
-                  Accords trouvés {foundChords.length === 0 && <span style={{ color: "#ff6060", textTransform: "none", letterSpacing: 0 }}>— aucune correspondance</span>}
+                <div className="section-label section-label--mb-14 found-section-label">
+                  Accords trouvés{" "}
+                  {foundChords.length === 0 && (
+                    <span className="found-empty">— aucune correspondance</span>
+                  )}
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <div className="results-list">
                   {foundChords.map((chord, i) => (
-                    <div key={i} className="result-card" style={{
-                      background: "rgba(200,152,42,0.06)",
-                      border: "1px solid rgba(200,152,42,0.25)",
-                      borderRadius: 12,
-                      padding: "14px 20px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}>
+                    <div key={i} className="result-card">
                       <div>
-                        <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, color: "#c8982a" }}>{noteLabel(chord.root)}</span>
-                        <span style={{ fontSize: 14, color: "#9090a0", marginLeft: 8 }}>{chord.type}</span>
+                        <span className="result-card__root">{noteLabel(chord.root)}</span>
+                        <span className="result-card__type">{chord.type}</span>
                       </div>
-                      <div style={{ display: "flex", gap: 6 }}>
+                      <div className="result-card__notes">
                         {chord.notes.map((n, j) => (
-                          <span key={j} style={{ fontSize: 12, color: "#c0b8a8", background: "#1e1c28", padding: "3px 8px", borderRadius: 5 }}>{noteLabel(n)}</span>
+                          <span key={j} className="result-card__note-chip">
+                            {noteLabel(n)}
+                          </span>
                         ))}
                       </div>
                     </div>
@@ -289,47 +203,30 @@ export default function App() {
       </div>
 
       {/* Piano Keyboard */}
-      <div style={{
-        background: "#100e16",
-        border: "1px solid #2a2535",
-        borderRadius: 20,
-        padding: "28px 32px 24px",
-        width: "100%",
-        maxWidth: 680,
-      }}>
-        <div style={{ fontSize: 11, letterSpacing: 4, color: "#666", textTransform: "uppercase", marginBottom: 20 }}>
-          Clavier
-        </div>
-        <div style={{ position: "relative", height: 130, display: "flex", justifyContent: "center" }}>
-          {/* White keys */}
-          <div style={{ display: "flex", gap: 3 }}>
-            {WHITE_KEYS.map((noteIdx, i) => {
+      <div className="piano-section">
+        <div className="section-label section-label--mb-20">Clavier</div>
+        <div className="piano-rack">
+          <div className="white-keys-row">
+            {WHITE_KEYS.map(noteIdx => {
               const note = NOTES[noteIdx];
               const isActive = activeNotes.includes(note);
               const isHovered = hoveredNote === note;
+              const interactive = mode === "notes-to-chord";
               return (
                 <div
                   key={noteIdx}
-                  className="piano-key"
+                  className={[
+                    "piano-key",
+                    "white-key",
+                    isActive && "white-key--active",
+                    !isActive && isHovered && "white-key--hover",
+                    interactive ? "piano-key--interactive" : "piano-key--default-cursor",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                   onClick={() => mode === "notes-to-chord" && toggleNote(note)}
                   onMouseEnter={() => setHoveredNote(note)}
                   onMouseLeave={() => setHoveredNote(null)}
-                  style={{
-                    width: 52,
-                    height: 120,
-                    background: isActive ? "linear-gradient(to bottom, #e8c870, #c8982a)" : isHovered ? "#f0e8d8" : "#f5f0e8",
-                    borderRadius: "0 0 8px 8px",
-                    border: isActive ? "1px solid #c8982a" : "1px solid #d0c8b8",
-                    display: "flex",
-                    alignItems: "flex-end",
-                    justifyContent: "center",
-                    paddingBottom: 8,
-                    fontSize: 11,
-                    color: isActive ? "#3a2000" : "#999",
-                    fontWeight: isActive ? 600 : 400,
-                    boxShadow: isActive ? "0 0 20px rgba(200,152,42,0.4)" : "0 4px 12px rgba(0,0,0,0.5)",
-                    cursor: mode === "notes-to-chord" ? "pointer" : "default",
-                  }}
                 >
                   {isActive || isHovered ? note : ""}
                 </div>
@@ -337,39 +234,29 @@ export default function App() {
             })}
           </div>
 
-          {/* Black keys */}
-          <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: 7 * 55, display: "flex" }}>
+          <div className="black-keys-layer">
             {NOTES.map((note, noteIdx) => {
               const blackPos = BLACK_KEY_POSITIONS[noteIdx];
               if (blackPos === undefined) return null;
               const isActive = activeNotes.includes(note);
               const isHovered = hoveredNote === note;
+              const interactive = mode === "notes-to-chord";
               return (
                 <div
                   key={noteIdx}
-                  className="piano-key"
+                  className={[
+                    "piano-key",
+                    "black-key",
+                    isActive && "black-key--active",
+                    !isActive && isHovered && "black-key--hover",
+                    interactive ? "piano-key--interactive" : "piano-key--default-cursor",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  style={{ left: (blackPos - 1) * 55 + 35 }}
                   onClick={() => mode === "notes-to-chord" && toggleNote(note)}
                   onMouseEnter={() => setHoveredNote(note)}
                   onMouseLeave={() => setHoveredNote(null)}
-                  style={{
-                    position: "absolute",
-                    left: (blackPos - 1) * 55 + 35,
-                    width: 34,
-                    height: 76,
-                    background: isActive ? "linear-gradient(to bottom, #c8982a, #7a5a10)" : isHovered ? "#3a3040" : "#1a1520",
-                    borderRadius: "0 0 6px 6px",
-                    zIndex: 2,
-                    display: "flex",
-                    alignItems: "flex-end",
-                    justifyContent: "center",
-                    paddingBottom: 6,
-                    fontSize: 9,
-                    color: isActive ? "#fff" : "#666",
-                    fontWeight: isActive ? 600 : 400,
-                    boxShadow: isActive ? "0 0 16px rgba(200,152,42,0.5)" : "0 4px 10px rgba(0,0,0,0.8)",
-                    cursor: mode === "notes-to-chord" ? "pointer" : "default",
-                    border: isActive ? "1px solid rgba(200,152,42,0.6)" : "none",
-                  }}
                 >
                   {isActive || isHovered ? noteLabel(note) : ""}
                 </div>
@@ -379,7 +266,7 @@ export default function App() {
         </div>
       </div>
 
-      <div style={{ marginTop: 28, fontSize: 11, color: "#3a3545", letterSpacing: 2 }}>
+      <div className="app-footer">
         {NOTES.length} notes · {Object.keys(CHORD_TYPES).length} types d'accords
       </div>
     </div>
