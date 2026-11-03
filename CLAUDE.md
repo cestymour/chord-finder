@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run preview` — serve the built `dist/`
 - `npm run lint` — ESLint (flat config, `eslint.config.js`)
 
-There is no test framework set up. Node version is pinned in `.nvmrc` (24), while the CI workflow uses Node 20.
+There is no test framework set up. Node version is pinned in `.nvmrc` (24); the CI workflow reads it via `node-version-file`.
 
 ## Architecture
 

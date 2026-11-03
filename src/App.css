@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:wght@700;900&display=swap");
-
 * {
   box-sizing: border-box;
 }
@@ -296,8 +294,18 @@
 }
 
 .piano-key {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+  line-height: normal;
   transition: all 0.1s ease;
   cursor: pointer;
+}
+
+.piano-key:focus-visible {
+  outline: 2px solid #c8982a;
+  outline-offset: 2px;
 }
 
 .piano-key:hover {

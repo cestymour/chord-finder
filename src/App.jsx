@@ -40,13 +40,13 @@ function noteLabel(note) {
 
 function findChords(selectedNotes) {
   if (selectedNotes.length < 2) return [];
+  const sel = new Set(selectedNotes);
   const results = [];
   for (const root of NOTES) {
     for (const [type, intervals] of Object.entries(CHORD_TYPES)) {
       const chordNotes = getChordNotes(root, intervals);
-      const sel = [...selectedNotes].sort();
-      const chord = [...chordNotes].sort();
-      if (sel.length === chord.length && sel.every((n, i) => n === chord[i])) {
+      const chord = new Set(chordNotes);
+      if (sel.size === chord.size && chordNotes.every(n => sel.has(n))) {
         results.push({ root, type, notes: chordNotes });
       }
     }
@@ -79,6 +79,38 @@ export default function App() {
     );
   }
 
+  const interactive = mode === "notes-to-chord";
+
+  function renderKey(note, kind, style) {
+    const isActive = activeNotes.includes(note);
+    const isHovered = hoveredNote === note;
+    return (
+      <button
+        key={note}
+        type="button"
+        className={[
+          "piano-key",
+          kind,
+          isActive && `${kind}--active`,
+          !isActive && isHovered && `${kind}--hover`,
+          interactive ? "piano-key--interactive" : "piano-key--default-cursor",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        style={style}
+        aria-label={noteLabel(note)}
+        aria-pressed={interactive ? isActive : undefined}
+        aria-disabled={!interactive || undefined}
+        tabIndex={interactive ? 0 : -1}
+        onClick={() => interactive && toggleNote(note)}
+        onMouseEnter={() => setHoveredNote(note)}
+        onMouseLeave={() => setHoveredNote(null)}
+      >
+        {isActive || isHovered ? noteLabel(note) : ""}
+      </button>
+    );
+  }
+
   return (
     <div className="app">
       {/* Header */}
@@ -94,7 +126,9 @@ export default function App() {
             key={m}
             type="button"
             className={`mode-btn${mode === m ? " mode-btn--active" : ""}`}
+            aria-pressed={mode === m}
             onClick={() => {
+              if (m === mode) return;
               setMode(m);
               setSelectedNotes([]);
             }}
@@ -207,61 +241,13 @@ export default function App() {
         <div className="section-label section-label--mb-20">Clavier</div>
         <div className="piano-rack">
           <div className="white-keys-row">
-            {WHITE_KEYS.map(noteIdx => {
-              const note = NOTES[noteIdx];
-              const isActive = activeNotes.includes(note);
-              const isHovered = hoveredNote === note;
-              const interactive = mode === "notes-to-chord";
-              return (
-                <div
-                  key={noteIdx}
-                  className={[
-                    "piano-key",
-                    "white-key",
-                    isActive && "white-key--active",
-                    !isActive && isHovered && "white-key--hover",
-                    interactive ? "piano-key--interactive" : "piano-key--default-cursor",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  onClick={() => mode === "notes-to-chord" && toggleNote(note)}
-                  onMouseEnter={() => setHoveredNote(note)}
-                  onMouseLeave={() => setHoveredNote(null)}
-                >
-                  {isActive || isHovered ? note : ""}
-                </div>
-              );
-            })}
+            {WHITE_KEYS.map(noteIdx => renderKey(NOTES[noteIdx], "white-key"))}
           </div>
 
           <div className="black-keys-layer">
-            {NOTES.map((note, noteIdx) => {
-              const blackPos = BLACK_KEY_POSITIONS[noteIdx];
-              if (blackPos === undefined) return null;
-              const isActive = activeNotes.includes(note);
-              const isHovered = hoveredNote === note;
-              const interactive = mode === "notes-to-chord";
-              return (
-                <div
-                  key={noteIdx}
-                  className={[
-                    "piano-key",
-                    "black-key",
-                    isActive && "black-key--active",
-                    !isActive && isHovered && "black-key--hover",
-                    interactive ? "piano-key--interactive" : "piano-key--default-cursor",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  style={{ left: (blackPos - 1) * 55 + 35 }}
-                  onClick={() => mode === "notes-to-chord" && toggleNote(note)}
-                  onMouseEnter={() => setHoveredNote(note)}
-                  onMouseLeave={() => setHoveredNote(null)}
-                >
-                  {isActive || isHovered ? noteLabel(note) : ""}
-                </div>
-              );
-            })}
+            {Object.entries(BLACK_KEY_POSITIONS).map(([noteIdx, blackPos]) =>
+              renderKey(NOTES[noteIdx], "black-key", { left: (blackPos - 1) * 55 + 35 })
+            )}
           </div>
         </div>
       </div>
